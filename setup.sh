@@ -145,9 +145,17 @@ DROPIN_DIR="/etc/ssh/sshd_config.d"
 OURFILE="${DROPIN_DIR}/00-vps-init.conf"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 
-# نسخة احتياطية
-cp -a "$SSHD_MAIN" "${SSHD_MAIN}.vps-init.bak.${STAMP}"
-info "نسخة احتياطية: ${SSHD_MAIN}.vps-init.bak.${STAMP}"
+# تأكد من وجود openssh-server (الحاويات الدنيا — LXC/Proxmox — قد لا تحتويه)
+if ! command -v sshd >/dev/null 2>&1; then
+  warn "openssh-server غير مثبّت — يجري تثبيته..."
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update -qq || warn "فشل apt-get update — المتابعة."
+  apt-get install -y -qq openssh-server
+  systemctl enable ssh >/dev/null 2>&1 || true
+fi
+
+# نسخة احتياطية (إن وُجد الملف)
+[ -f "$SSHD_MAIN" ] && { cp -a "$SSHD_MAIN" "${SSHD_MAIN}.vps-init.bak.${STAMP}"; info "نسخة احتياطية: ${SSHD_MAIN}.vps-init.bak.${STAMP}"; }
 
 # تعطيل أي توجيهات متعارضة في الملف الرئيسي وملفات cloud-init (السبب الأول للفشل)
 KEYS="PasswordAuthentication PermitRootLogin KbdInteractiveAuthentication ChallengeResponseAuthentication"

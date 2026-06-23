@@ -24,6 +24,25 @@ sudo bash <(curl -fsSL https://raw.githubusercontent.com/haydary1986/vps-init/ma
 
 السكربت يقرأ مدخلاته من `/dev/tty`، لذا تعمل أسئلة الـ wizard بشكل صحيح حتى عند الاستدعاء عبر الأنبوب `curl | bash`.
 
+> **أنت root أصلًا؟** أسقط `sudo`.
+
+### إذا لم يكن `curl` مثبّتًا (حاويات LXC/Proxmox الدنيا)
+
+ثبّته أولًا ثم شغّل:
+
+```bash
+apt update && apt install -y curl
+curl -fsSL https://raw.githubusercontent.com/haydary1986/vps-init/main/setup.sh -o /tmp/vps-init.sh && bash /tmp/vps-init.sh
+```
+
+أو استخدم `wget` بدلًا منه دون تثبيت أي شيء:
+
+```bash
+wget -qO- https://raw.githubusercontent.com/haydary1986/vps-init/main/setup.sh | bash
+```
+
+> السكربت يثبّت `openssh-server` تلقائيًا إن لم يكن موجودًا في الحاوية.
+
 ## ملاحظات مهمة
 
 - **لا تُغلق جلستك الحالية** قبل اختبار الدخول من نافذة جديدة — تحسبًا لأي خطأ.
